@@ -8,13 +8,13 @@
   <em>A Fluent C# Library for Building Responsive, Email-Client-Compatible HTML</em>
 </p>
 
-<p align="center">
-  <!-- NuGet Version Badge -->
-  [![NuGet version](https://img.shields.io/nuget/v/Jattac.Libs.HtmlBuilder.svg)](https://www.nuget.org/packages/Jattac.Libs.HtmlBuilder/)
-  <!-- License Badge - Corrected link -->
-  [![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/nyingimaina/Jattac.Libs.HtmlBuilder/blob/master/LICENSE)
-  <!-- Add more badges here as needed, e.g., Build Status, Downloads, etc. -->
-</p>
+<!-- NuGet Version Badge -->
+ [![NuGet version](https://img.shields.io/nuget/v/Jattac.Libs.HtmlBuilder.svg)](https://www.nuget.org/packages/Jattac.Libs.HtmlBuilder/)
+<!-- License Badge - Corrected link -->
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/nyingimaina/Jattac.Libs.HtmlBuilder/blob/master/LICENSE)
+<!-- Add more badges here as needed, e.g., Build Status, Downloads, etc. -->
+
+
 
 <p align="center">
   <a href="#features">Features</a> &bull;
