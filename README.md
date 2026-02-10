@@ -1,12 +1,85 @@
-# Fluent HTML Builder (Jattac.Libs.HtmlBuilder v1.0.0)
+<p align="center">
+  <img src="icon.png" alt="Jattac.Libs.HtmlBuilder Logo" width="150"/>
+</p>
 
-A C# library for programmatically building responsive, email-client-compatible HTML with a focus on a dream developer experience (DX). This library uses a fluent, expression-based API to create readable, maintainable, and boilerplate-free HTML structures.
+<h1 align="center">Jattac.Libs.HtmlBuilder</h1>
 
-- **Fluent & Discoverable:** A chainable, context-aware API that guides you via IntelliSense.
-- **Readable & Self-Documenting:** Your C# code visually mirrors the HTML structure it creates.
-- **DRY (Don't Repeat Yourself):** A powerful theming system allows you to define styles and attributes once and reuse them everywhere.
-- **Flexible:** Supports both a declarative, lambda-based syntax for clean structure and an imperative, object-based syntax for dynamic, data-driven content.
-- **Safe & Robust:** All content is HTML-encoded by default, and a fail-fast validation system ensures you never generate broken HTML.
+<p align="center">
+  <em>A Fluent C# Library for Building Responsive, Email-Client-Compatible HTML</em>
+</p>
+
+<p align="center">
+  <!-- NuGet Version Badge -->
+  [![NuGet version](https://img.shields.io/nuget/v/Jattac.Libs.HtmlBuilder.svg)](https://www.nuget.org/packages/Jattac.Libs.HtmlBuilder/)
+  <!-- License Badge -->
+  [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+  <!-- Add more badges here as needed, e.g., Build Status, Downloads, etc. -->
+</p>
+
+<p align="center">
+  <a href="#features">Features</a> &bull;
+  <a href="#installation">Installation</a> &bull;
+  <a href="#two-ways-to-build-declarative-vs-imperative">Usage</a> &bull;
+  <a href="#styling--theming-a-comprehensive-walkthrough">Theming</a> &bull;
+  <a href="#validation--error-handling">Validation</a> &bull;
+  <a href="#license">License</a>
+</p>
+
+---
+
+## Table of Contents
+
+- [Introduction](#introduction)
+- [Features](#features)
+- [Installation](#installation)
+- [Two Ways to Build: Declarative vs. Imperative](#two-ways-to-build-declarative-vs-imperative)
+  - [Declarative Style](#declarative-style-recommended-for-most-uses)
+  - [Imperative Style](#imperative-style-for-dynamic-content)
+- [Building Elements](#building-elements)
+  - [Generic & Basic Text](#generic--basic-text)
+  - [Advanced Text Formatting & Links](#advanced-text-formatting--links)
+  - [Images](#images)
+  - [Lists](#lists)
+  - [Tables](#tables)
+  - [Tables with Rowspan and Colspan](#tables-with-rowspan-and-colspan)
+- [Styling & Theming: A Comprehensive Walkthrough](#styling--theming-a-comprehensive-walkthrough)
+  - [1. Defining a Theme](#1-defining-a-theme)
+  - [2. Applying a Theme to Your Document](#2-applying-a-theme-to-your-document)
+  - [3. Applying Classes to Elements](#3-applying-classes-to-elements)
+  - [4. Local Style Overrides](#4-local-style-overrides)
+  - [5. Attribute Merging Logic](#5-attribute-merging-logic)
+  - [6. Comprehensive Theming Walkthrough Example](#6-comprehensive-theming-walkthrough-example)
+- [Validation & Error Handling](#validation--error-handling)
+- [Contributing](#contributing)
+- [License](#license)
+
+---
+
+## Introduction
+
+Jattac.Libs.HtmlBuilder is a C# library meticulously crafted to provide a **dream developer experience (DX)** for programmatically constructing responsive, email-client-compatible HTML. It eliminates the boilerplate and fragility often associated with manual HTML string manipulation, offering a fluent, discoverable, and self-documenting API.
+
+## Features
+
+- **Fluent & Discoverable API:** Design HTML structures using a natural, chainable syntax guided by IntelliSense.
+- **Minimal Boilerplate:** Drastically reduces the amount of code needed to generate common HTML elements.
+- **DRY Theming System:** Define and apply styles and attributes once, ensuring consistency and easy maintenance across your HTML.
+- **Flexible Construction:** Supports both declarative (lambda-based) and imperative (standalone builder) paradigms.
+- **Advanced Text Composition:** Effortlessly mix plain text, bold, italic, and links, including nested inline elements.
+- **Robust Table Builder:** Create complex tables with explicit header definition and support for `rowspan` and `colspan`.
+- **Built-in Validation:** Fail-fast error handling prevents broken HTML generation for invalid structures (e.g., missing image sources or malformed links).
+- **Email Compatibility:** All CSS is automatically inlined into `style` attributes, ensuring maximum compatibility across various email clients.
+- **Security:** Aggressively HTML-encodes user-provided content by default to prevent XSS vulnerabilities.
+
+## Installation
+
+The Jattac.Libs.HtmlBuilder library is available as a NuGet package.
+
+```bash
+dotnet add package Jattac.Libs.HtmlBuilder
+```
+
+Or, search for `Jattac.Libs.HtmlBuilder` in your NuGet Package Manager.
 
 ---
 
@@ -379,3 +452,11 @@ Console.WriteLine(doc.Build());
 
 The library uses a **"fail-fast"** principle. If you try to build an invalid node (e.g., an `Image` without a `src`), the `.Build()` method will throw an `InvalidOperationException` with a clear error message, preventing broken HTML from being generated.
 For tables, automatic column count validation is applied to ensure all rows match the header (or first data row) count. However, this validation is **skipped if any cell in the table uses `rowSpan` or `colSpan` attributes**, placing the responsibility for structural correctness on the developer.
+
+## Contributing
+
+We welcome contributions! Please feel free to open issues or submit pull requests.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

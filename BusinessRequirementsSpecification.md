@@ -1,4 +1,4 @@
-# Business Requirements Specification (BRS): Fluent Email HTML Builder (Version 2.3)
+# Business Requirements Specification (BRS): Jattac.Libs.HtmlBuilder (Version 2.3)
 
 ## 1. Vision & Purpose
 To provide C# developers with a **dream developer experience (DX)** for programmatically building responsive, email-client-compatible HTML. The library will eliminate boilerplate and the fragility of string manipulation, enabling the rapid and reliable creation of common HTML content structures through a fluent, expression-based API.
@@ -55,3 +55,4 @@ The MVP will focus on the following foundational elements:
 
 ## 7. Project Deliverables
 *   **Documentation & Examples:** The final deliverable must include clear API documentation with practical usage examples, especially for setting up and using the Theming system and advanced text composition. This documentation will be maintained in `README.md` and `BusinessRequirementsSpecification.md`, ensuring they remain synchronized with the codebase.
+*   **NuGet Package Readiness:** The project will be configured with all necessary metadata for deployment as a modern NuGet package (`Jattac.Libs.HtmlBuilder`).
