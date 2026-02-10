@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Jattac.Libs.HtmlBuilder.HtmlModel;
 
 namespace Jattac.Libs.HtmlBuilder
@@ -45,7 +46,7 @@ namespace Jattac.Libs.HtmlBuilder
 
         public DocumentBuilder AddNode(IHtmlNode node) { _doc.Add(node); return this; }
         
-        // --- New Generic Text Methods ---
+        // --- Text Methods ---
         public DocumentBuilder Text(string text, string asTag = "p") => AddNode(new TextNode(asTag).With(n => n.AddChild(new RawTextNode(text))));
         public DocumentBuilder Text(Action<TextContentBuilder> config, string asTag = "p")
         {
@@ -54,15 +55,35 @@ namespace Jattac.Libs.HtmlBuilder
             config(builder);
             return AddNode(textNode);
         }
-
-        // --- Convenience Text Methods ---
         public DocumentBuilder Heading1(string text) => Text(text, "h1");
         public DocumentBuilder Heading2(string text) => Text(text, "h2");
         public DocumentBuilder Paragraph(string text) => Text(text, "p");
         public DocumentBuilder Paragraph(Action<TextContentBuilder> config) => Text(config, "p");
 
+        // --- New Generic and Convenience Methods ---
+        public DocumentBuilder RawHtml(string html) => AddNode(new RawHtmlNode(html));
+        public DocumentBuilder HorizontalRule() => AddNode(new HrNode());
+        public DocumentBuilder Spacer(string height) => AddNode(new GenericElementNode("div").With(n => n.AddStyle("height", height)));
+        public DocumentBuilder Element(string tag, Action<GenericBuilder> config)
+        {
+            var builder = new GenericBuilder(new GenericElementNode(tag), _theme);
+            config(builder);
+            return AddNode(builder.GetNode());
+        }
+
         public DocumentBuilder Image(string src, string alt = "") => AddNode(new ImageNode().With(n => { n.AddAttribute("src", src); n.AddAttribute("alt", alt); }));
         
+        // --- New Data-Bound List ---
+        public DocumentBuilder ListFor<T>(IEnumerable<T> items, Action<ListBuilder, T> config)
+        {
+            var listBuilder = new ListBuilder(new ListNode(false), _theme);
+            foreach (var item in items)
+            {
+                config(listBuilder, item);
+            }
+            return AddNode(listBuilder.GetNode());
+        }
+
         public DocumentBuilder List(Action<ListBuilder> config)
         {
             var builder = new ListBuilder(new ListNode(false), _theme);
@@ -77,7 +98,6 @@ namespace Jattac.Libs.HtmlBuilder
             return AddNode(builder.GetNode());
         }
 
-        // --- Table Builder ---
         public DocumentBuilder Table(Action<TableBuilder> config)
         {
             var builder = new TableBuilder(new TableNode(), _theme);
@@ -85,8 +105,24 @@ namespace Jattac.Libs.HtmlBuilder
             return AddNode(builder.GetNode());
         }
     }
+    
+    // A builder for any generic element
+    public class GenericBuilder : Builder<GenericBuilder, GenericElementNode>
+    {
+        internal GenericBuilder(GenericElementNode node, Theme theme) : base(node, theme) { }
+        public GenericBuilder Content(string text)
+        {
+            _node.AddChild(new RawTextNode(text));
+            return this;
+        }
+        public GenericBuilder Content(Action<TextContentBuilder> config)
+        {
+            var builder = new TextContentBuilder(_node, _theme);
+            config(builder);
+            return this;
+        }
+    }
 
-    // --- New builder for inline text content ---
     public class TextContentBuilder
     {
         private readonly ElementNode _parentNode;
@@ -120,7 +156,6 @@ namespace Jattac.Libs.HtmlBuilder
         {
             var linkNode = new LinkNode();
             linkNode.AddAttribute("href", href);
-
             var builder = new TextContentBuilder(linkNode, _theme);
             config(builder);
             _parentNode.AddChild(linkNode);
@@ -142,40 +177,31 @@ namespace Jattac.Libs.HtmlBuilder
     public class TableBuilder : Builder<TableBuilder, TableNode>
     {
         internal TableBuilder(TableNode node, Theme theme) : base(node, theme) { }
-        
-        private int? _internalExpectedColumnCount; // To manage column count for validation
-        // Removed: private bool _hasSpansUsed = false; // This field was redundant
-
+        private int? _internalExpectedColumnCount;
         public TableBuilder Header(Action<RowBuilder> config)
         {
             if (_internalExpectedColumnCount.HasValue) throw new InvalidOperationException("Table can only have one header row.");
-
             var builder = new RowBuilder(new TableRowNode(), _theme, this);
             config(builder);
             _node.AddChild(builder.GetNode());
             _internalExpectedColumnCount = ((TableRowNode)builder.GetNode()).ChildCount;
             return this;
         }
-
         public TableBuilder Row(Action<RowBuilder> config)
         {
             var builder = new RowBuilder(new TableRowNode(), _theme, this);
             config(builder);
             _node.AddChild(builder.GetNode());
-
             if (!_internalExpectedColumnCount.HasValue)
             {
                  _internalExpectedColumnCount = ((TableRowNode)builder.GetNode()).ChildCount;
             }
             return this;
         }
-
-        // Internal method for RowBuilder to signal span usage
         internal void SetHasSpans()
         {
-            ((TableNode)_node).HasSpans = true; // Directly sets HasSpans on the TableNode
+            ((TableNode)_node).HasSpans = true;
         }
-
         public new IHtmlNode GetNode()
         {
             ((TableNode)_node).ExpectedColumnCount = _internalExpectedColumnCount;
@@ -186,12 +212,10 @@ namespace Jattac.Libs.HtmlBuilder
     public class RowBuilder : Builder<RowBuilder, TableRowNode>
     {
         private readonly TableBuilder? _parentTableBuilder;
-
         internal RowBuilder(TableRowNode node, Theme theme, TableBuilder? parentTableBuilder = null) : base(node, theme) 
         {
             _parentTableBuilder = parentTableBuilder;
         }
-
         public RowBuilder Cell(string text, int rowSpan = 1, int colSpan = 1) => Cell(new RawTextNode(text), rowSpan, colSpan);
         public RowBuilder Cell(IHtmlNode content, int rowSpan = 1, int colSpan = 1)
         {
@@ -199,7 +223,6 @@ namespace Jattac.Libs.HtmlBuilder
             _node.AddChild(new TableCellNode(false, rowSpan, colSpan).With(n => n.AddChild(content)));
             return this;
         }
-
         public RowBuilder HeaderCell(string text, int rowSpan = 1, int colSpan = 1) => HeaderCell(new RawTextNode(text), rowSpan, colSpan);
         public RowBuilder HeaderCell(IHtmlNode content, int rowSpan = 1, int colSpan = 1)
         {

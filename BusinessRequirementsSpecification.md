@@ -19,6 +19,9 @@ The MVP will focus on the following foundational elements:
 *   **Images:** `<img>` tags with `src` and `alt` attributes.
 *   **Tables:** The complete structure of `<table>`, `<tr>`, `<th>`, and `<td>`, including support for `rowspan` and `colspan` attributes.
 *   **Lists:** Ordered (`<ol>`) and unordered (`<ul>`) lists with `<li>` items.
+*   **Layout Helpers:** Horizontal rules (`<hr>`) and spacers (`<div>` with height).
+*   **Generic Elements:** A builder for any arbitrary HTML tag.
+*   **Raw HTML:** An "escape hatch" for injecting pre-formatted HTML strings.
 
 ### 3.2 Explicitly Out-of-Scope for MVP:
 *   **Complex Nesting:** Nesting structural elements is disallowed. For example, a `TableCell` can contain text, a link, or an image, but it cannot contain another `Table` or a `List`.
@@ -39,7 +42,10 @@ The MVP will focus on the following foundational elements:
 *   **Core Builders:** Provide dedicated, fluent builders for all in-scope elements. Builders must support both declarative (lambda-based) and imperative (standalone object) construction.
 *   **Flexible Text Block Creation:** The API must provide a generic method to create any block-level text element (e.g., `p`, `h1`-`h6`, `div`, `span`) by specifying the tag name as a string (`asTag` parameter). Convenience methods for common tags (`.Paragraph()`, `.Heading1()`) must also be available.
 *   **Advanced Text Composition:** A dedicated `TextContentBuilder` must be provided to allow for the fluent composition of mixed inline content within a single text block. This includes mixing plain text (`Raw`), `<strong>` (`Bold`), `<em>` (`Italic`), and `<a>` (`Link`) elements, including nested combinations (e.g., bold and italic text, bold text inside a link).
+*   **Data-Bound Lists:** Provide a `ListFor` method to generate list items directly from an `IEnumerable<T>` collection.
 *   **Table Enhancements:** The `TableBuilder` will provide a `Header()` method for explicit header row definition. `RowBuilder`'s `Cell()` and `HeaderCell()` methods will support optional `rowspan` and `colspan` attributes.
+*   **Layout & Generic Builders:** Provide convenience builders for layout elements (`HorizontalRule`, `Spacer`) and a generic `Element` builder for creating any custom tag.
+*   **Raw HTML Injection:** Provide a `RawHtml` method to inject pre-formatted HTML, bypassing the library's safety and styling features.
 *   **Local Style Overrides:** Developers must be able to define arbitrary, one-off CSS styles (`.Style("key", "value")`) and HTML attributes (`.Attr("key", "value")`) on any element builder. These local definitions will always take precedence over any conflicting theme styles or attributes.
 *   **Comprehensive Documentation:** Provide detailed examples and walkthroughs for using links, and all other fluent builder capabilities.
 

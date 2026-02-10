@@ -6,6 +6,14 @@ using System.Text;
 
 namespace Jattac.Libs.HtmlBuilder.HtmlModel
 {
+    // A node for raw, un-encoded HTML content. Use with caution.
+    public class RawHtmlNode : IHtmlNode
+    {
+        private readonly string _html;
+        public RawHtmlNode(string html) { _html = html; }
+        public string Build(Theme theme) => _html;
+    }
+    
     // A simple node for raw text content, which will be HTML encoded.
     public class RawTextNode : IHtmlNode
     {
@@ -73,7 +81,7 @@ namespace Jattac.Libs.HtmlBuilder.HtmlModel
                 sb.Append($" style=\"{styleString}\"");
             }
             
-            bool selfClosing = _tag == "img";
+            bool selfClosing = _tag == "img" || _tag == "hr"; // hr is also self-closing
             if (selfClosing)
             {
                 sb.Append(" />");
@@ -111,8 +119,10 @@ namespace Jattac.Libs.HtmlBuilder.HtmlModel
 
     // Concrete model nodes
     public class TextNode : ElementNode { public TextNode(string tag) : base(tag) { } }
+    public class GenericElementNode : ElementNode { public GenericElementNode(string tag) : base(tag) { } } // New generic element
     public class StrongNode : ElementNode { public StrongNode() : base("strong") { } }
     public class EmNode : ElementNode { public EmNode() : base("em") { } }
+    public class HrNode : ElementNode { public HrNode() : base("hr") { } } // New
     public class LinkNode : ElementNode 
     { 
         public LinkNode() : base("a") { }
@@ -135,19 +145,13 @@ namespace Jattac.Libs.HtmlBuilder.HtmlModel
     public class TableNode : ElementNode 
     { 
         public TableNode() : base("table") { } 
-        public int? ExpectedColumnCount { get; set; } // Track expected column count
-        public bool HasSpans { get; set; } // Flag to indicate if any cell has row/col span
+        public int? ExpectedColumnCount { get; set; }
+        public bool HasSpans { get; set; }
 
         protected override void Validate()
         {
-            if (HasSpans) return; // Skip validation if spans are present
-
-            if (!ExpectedColumnCount.HasValue)
-            {
-                // If no header or first row defined expected count, it's an issue for strict validation
-                // For now, let's assume if ExpectedColumnCount isn't set, we don't strictly validate (or could throw)
-                return; 
-            }
+            if (HasSpans) return;
+            if (!ExpectedColumnCount.HasValue) return; 
 
             foreach (var child in _children)
             {
@@ -164,7 +168,7 @@ namespace Jattac.Libs.HtmlBuilder.HtmlModel
     public class TableRowNode : ElementNode 
     { 
         public TableRowNode() : base("tr") { } 
-        public int ChildCount => _children.Count; // Expose child count for validation
+        public int ChildCount => _children.Count;
     }
     public class TableCellNode : ElementNode 
     { 
