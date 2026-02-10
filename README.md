@@ -1,4 +1,4 @@
-# Fluent HTML Builder (v2)
+# Fluent HTML Builder (v2.1)
 
 A C# library for programmatically building responsive, email-client-compatible HTML with a focus on a dream developer experience (DX). This library uses a fluent, expression-based API to create readable, maintainable, and boilerplate-free HTML structures.
 
@@ -47,42 +47,54 @@ Console.WriteLine(doc.Build());
 
 ---
 
-## ⚙️ Declarative Usage Examples
+## 🧱 Building Elements
 
-### Basic Elements
+### Generic & Basic Text
+The most flexible way to create a text element is with the generic `.Text()` method. You can also use the convenient `.Paragraph()`, `.Heading1()`, etc. methods.
 
 ```csharp
 var doc = new HtmlDocument(doc =>
 {
     doc.Heading1("This is a Heading 1");
-    doc.Heading2("This is a Heading 2");
     doc.Paragraph("This is a standard paragraph of text.");
-    doc.Image("https://via.placeholder.com/150", alt: "A placeholder image");
+    
+    // Use the generic method for any tag
+    doc.Text("This is a div.", asTag: "div");
+    doc.Text("This is a span.", asTag: "span");
 });
 ```
 
-### Lists
-The `List` builder creates `<ul>` lists, and `OrderedList` creates `<ol>` lists.
+### Advanced Text Formatting
+For text with mixed formatting (bold, italics, links), use the `Action` overload to get a `TextContentBuilder`. This allows you to compose inline elements fluently.
 
 ```csharp
 var doc = new HtmlDocument(doc =>
 {
-    doc.List(list => 
+    doc.Paragraph(p =>
     {
-        list.Item("First item")
-            .Item("Second item");
+        p.Raw("This text is normal. ")
+         .Bold(b => b.Raw("This part is bold, but ").Italic("this part is bold and italic."))
+         .Raw(" Now back to normal, and here is a ")
+         .Link("https://example.com", "link!");
     });
-    
-    doc.OrderedList(list => 
-    {
-        list.Item("Step 1")
-            .Item("Step 2");
-    });
+});
+
+// Output:
+// <p>This text is normal. <strong>This part is bold, but <em>this part is bold and italic.</em></strong> Now back to normal, and here is a <a href="https://example.com">link!</a></p>
+```
+
+### Images
+Create self-closing `<img>` tags.
+
+```csharp
+var doc = new HtmlDocument(doc =>
+{
+    doc.Image("https://via.placeholder.com/150", alt: "A placeholder image");
 });
 ```
 
-### Tables
-Chain `Table`, `Row`, `HeaderCell`, and `Cell` to build tables fluently.
+### Lists & Tables
+The API for Lists and Tables remains the same powerful and fluent experience.
 
 ```csharp
 var doc = new HtmlDocument(doc =>
@@ -143,7 +155,6 @@ foreach (var p in products)
 var doc = new HtmlDocument(myTheme);
 doc.Add(tableBuilder.GetNode()); // Get the final IHtmlNode from the builder
 
-// The final document now contains your dynamic table
 Console.WriteLine(doc.Build());
 ```
 
@@ -159,36 +170,23 @@ Apply styles and attributes to any element using the fluent methods on its build
 
 **Precedence Rule:** Local styles/attributes **always override** theme styles/attributes.
 
-### Example: Combining Theming and Local Overrides
-
 ```csharp
-// 1. Define a Theme
-var myTheme = new Theme();
-myTheme.AddStyle("h1", new ElementStyle().SetStyle("color", "navy"));
-myTheme.AddStyle(".special-paragraph", new ElementStyle().SetStyle("font-style", "italic"));
-
-// 2. Build the document using the theme
-var doc = new HtmlDocument(myTheme, doc =>
+// This example uses the new TextContentBuilder
+var doc = new HtmlDocument(doc => 
 {
-    // This h1 will automatically be navy from the theme
-    doc.Heading1("Themed Heading");
-
-    // This paragraph gets a theme style via its class
-    doc.Paragraph("This is a special paragraph from the theme.")
-       .Class("special-paragraph");
-
-    // This paragraph overrides the theme with a local style
-    doc.Paragraph("This paragraph has a local style override.")
-       .Class("special-paragraph") // It matches the theme...
-       .Style("font-style", "normal") // ...but this local style wins!
-       .Style("color", "red");
+    doc.Paragraph(p => 
+    {
+        p.Raw("This is a ")
+         .Bold("bold statement")
+         .Style("color", "red") // Applies style to the <strong> tag
+         .Attr("data-id", "123");
+    });
 });
 
 // Output:
-// <h1 style="color:navy">Themed Heading</h1>
-// <p class="special-paragraph" style="font-style:italic">This is a special paragraph from the theme.</p>
-// <p class="special-paragraph" style="font-style:normal;color:red">This paragraph has a local style override.</p>
+// <p>This is a <strong style="color:red" data-id="123">bold statement</strong></p>
 ```
+**Note:** You can't chain fluent style methods directly after `Raw()`. They must be chained after an element-creating method like `Bold()`, `Italic()`, or `Link()`.
 
 ---
 

@@ -3,7 +3,7 @@ using HtmlBuilding.HtmlModel;
 
 namespace HtmlBuilding
 {
-    // A generic builder to provide common fluent methods.
+    // A generic builder to provide common fluent methods for element nodes.
     public abstract class Builder<TBuilder, TNode> where TBuilder : class where TNode : ElementNode
     {
         protected readonly TNode _node;
@@ -18,27 +18,25 @@ namespace HtmlBuilding
         public TBuilder Style(string key, string value)
         {
             _node.AddStyle(key, value);
-            return (this as TBuilder)!; // Added null-forgiving operator
+            return (this as TBuilder)!;
         }
 
         public TBuilder Class(string className)
         {
             _node.AddClass(className);
-            return (this as TBuilder)!; // Added null-forgiving operator
+            return (this as TBuilder)!;
         }
 
         public TBuilder Attr(string key, string value)
         {
             _node.AddAttribute(key, value);
-            return (this as TBuilder)!; // Added null-forgiving operator
+            return (this as TBuilder)!;
         }
 
-        /// <summary>
-        /// For standalone usage, gets the underlying node to be added to a parent.
-        /// </summary>
         public IHtmlNode GetNode() => _node;
     }
 
+    // Builder for the root of the document.
     public class DocumentBuilder
     {
         private readonly HtmlDocument _doc;
@@ -46,9 +44,23 @@ namespace HtmlBuilding
         internal DocumentBuilder(HtmlDocument doc, Theme theme) { _doc = doc; _theme = theme; }
 
         public DocumentBuilder AddNode(IHtmlNode node) { _doc.Add(node); return this; }
-        public DocumentBuilder Heading1(string text) => AddNode(new TextNode("h1").With(n => n.AddChild(new RawTextNode(text))));
-        public DocumentBuilder Heading2(string text) => AddNode(new TextNode("h2").With(n => n.AddChild(new RawTextNode(text))));
-        public DocumentBuilder Paragraph(string text) => AddNode(new TextNode("p").With(n => n.AddChild(new RawTextNode(text))));
+        
+        // --- New Generic Text Methods ---
+        public DocumentBuilder Text(string text, string asTag = "p") => AddNode(new TextNode(asTag).With(n => n.AddChild(new RawTextNode(text))));
+        public DocumentBuilder Text(Action<TextContentBuilder> config, string asTag = "p")
+        {
+            var textNode = new TextNode(asTag);
+            var builder = new TextContentBuilder(textNode, _theme);
+            config(builder);
+            return AddNode(textNode);
+        }
+
+        // --- Convenience Text Methods ---
+        public DocumentBuilder Heading1(string text) => Text(text, "h1");
+        public DocumentBuilder Heading2(string text) => Text(text, "h2");
+        public DocumentBuilder Paragraph(string text) => Text(text, "p");
+        public DocumentBuilder Paragraph(Action<TextContentBuilder> config) => Text(config, "p");
+
         public DocumentBuilder Image(string src, string alt = "") => AddNode(new ImageNode().With(n => { n.AddAttribute("src", src); n.AddAttribute("alt", alt); }));
         
         public DocumentBuilder List(Action<ListBuilder> config)
@@ -70,6 +82,48 @@ namespace HtmlBuilding
             var builder = new TableBuilder(new TableNode(), _theme);
             config(builder);
             return AddNode(builder.GetNode());
+        }
+    }
+
+    // --- New builder for inline text content ---
+    public class TextContentBuilder
+    {
+        private readonly ElementNode _parentNode;
+        private readonly Theme _theme;
+        internal TextContentBuilder(ElementNode parentNode, Theme theme) { _parentNode = parentNode; _theme = theme; }
+
+        public TextContentBuilder Raw(string text) { _parentNode.AddChild(new RawTextNode(text)); return this; }
+        
+        public TextContentBuilder Bold(string text) => Bold(b => b.Raw(text));
+        public TextContentBuilder Bold(Action<TextContentBuilder> config)
+        {
+            var strongNode = new StrongNode();
+            var builder = new TextContentBuilder(strongNode, _theme);
+            config(builder);
+            _parentNode.AddChild(strongNode);
+            return this;
+        }
+
+        public TextContentBuilder Italic(string text) => Italic(i => i.Raw(text));
+        public TextContentBuilder Italic(Action<TextContentBuilder> config)
+        {
+            var emNode = new EmNode();
+            var builder = new TextContentBuilder(emNode, _theme);
+            config(builder);
+            _parentNode.AddChild(emNode);
+            return this;
+        }
+
+        public TextContentBuilder Link(string href, string text) => Link(href, l => l.Raw(text));
+        public TextContentBuilder Link(string href, Action<TextContentBuilder> config)
+        {
+            var linkNode = new LinkNode();
+            linkNode.AddAttribute("href", href);
+
+            var builder = new TextContentBuilder(linkNode, _theme);
+            config(builder);
+            _parentNode.AddChild(linkNode);
+            return this;
         }
     }
 
@@ -113,7 +167,6 @@ namespace HtmlBuilding
         }
     }
 
-    // Helper extension for cleaner internal syntax
     internal static class NodeExtensions
     {
         internal static T With<T>(this T node, Action<T> configure) where T : ElementNode

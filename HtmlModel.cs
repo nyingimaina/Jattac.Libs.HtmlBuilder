@@ -7,15 +7,15 @@ using System.Text;
 namespace HtmlBuilding.HtmlModel
 {
     // A simple node for raw text content, which will be HTML encoded.
-    public class RawTextNode : IHtmlNode // Changed to public
+    public class RawTextNode : IHtmlNode
     {
         private readonly string _text;
-        public RawTextNode(string text) { _text = text; } // Changed to public
+        public RawTextNode(string text) { _text = text; }
         public string Build(Theme theme) => WebUtility.HtmlEncode(_text);
     }
 
     // Base class for all element-based nodes.
-    public abstract class ElementNode : IHtmlNode // Changed to public
+    public abstract class ElementNode : IHtmlNode
     {
         protected readonly string _tag;
         protected readonly List<string> _classes = new List<string>();
@@ -23,12 +23,12 @@ namespace HtmlBuilding.HtmlModel
         protected readonly Dictionary<string, string> _attributes = new Dictionary<string, string>();
         protected readonly List<IHtmlNode> _children = new List<IHtmlNode>();
 
-        public ElementNode(string tag) { _tag = tag; } // Changed to public
+        public ElementNode(string tag) { _tag = tag; }
 
-        public void AddChild(IHtmlNode child) => _children.Add(child); // Changed to public
-        public void AddClass(string className) => _classes.Add(className); // Changed to public
-        public void AddStyle(string key, string value) => _styles[key] = value; // Changed to public
-        public void AddAttribute(string key, string value) => _attributes[key] = value; // Changed to public
+        public void AddChild(IHtmlNode child) => _children.Add(child);
+        public void AddClass(string className) => _classes.Add(className);
+        public void AddStyle(string key, string value) => _styles[key] = value;
+        public void AddAttribute(string key, string value) => _attributes[key] = value;
         
         protected virtual void Validate() { }
 
@@ -66,7 +66,6 @@ namespace HtmlBuilding.HtmlModel
 
             foreach (var attr in finalAttributes) sb.Append($" {attr.Key}=\"{WebUtility.HtmlEncode(attr.Value)}\"");
             
-            // Re-structured the style attribute generation
             if (finalStyles.Any())
             {
                 var styleParts = finalStyles.Select(kv => $"{kv.Key}:{kv.Value}");
@@ -74,7 +73,7 @@ namespace HtmlBuilding.HtmlModel
                 sb.Append($" style=\"{styleString}\"");
             }
             
-            bool selfClosing = _tag == "img"; // Only image is self-closing in our MVP
+            bool selfClosing = _tag == "img";
             if (selfClosing)
             {
                 sb.Append(" />");
@@ -110,8 +109,10 @@ namespace HtmlBuilding.HtmlModel
         }
     }
 
-    // Concrete model nodes - all changed to public with public constructors
+    // Concrete model nodes
     public class TextNode : ElementNode { public TextNode(string tag) : base(tag) { } }
+    public class StrongNode : ElementNode { public StrongNode() : base("strong") { } } // New
+    public class EmNode : ElementNode { public EmNode() : base("em") { } } // New
     public class LinkNode : ElementNode 
     { 
         public LinkNode() : base("a") { }
