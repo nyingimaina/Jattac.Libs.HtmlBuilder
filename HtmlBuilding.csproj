@@ -9,7 +9,7 @@
     <!-- NuGet Package Properties -->
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageId>Jattac.Libs.HtmlBuilder</PackageId>
-    <Version>1.1.0</Version>
+    <Version>1.1.2</Version> <!-- Incremented version to 1.1.2 -->
     <Authors>Jattac Contributors</Authors>
     <Company>Jattac</Company>
     <Description>A fluent C# library for building responsive, email-client-compatible HTML with a dream developer experience.</Description>
@@ -20,6 +20,10 @@
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <PackageReleaseNotes>
+      v1.1.2:
+      - Fixed minor display issues in README.md badges/TOC.
+      - User-made changes to project properties.
+
       v1.1.0:
       - Added new convenience methods: HorizontalRule(), Spacer(), and RawHtml().
       - Added a generic Element() builder for creating any HTML tag.
@@ -39,7 +43,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="README.md" Pack="true" PackagePath="\" /> <!-- Re-added this line -->
+    <None Include="README.md" Pack="true" PackagePath="\" />
   </ItemGroup>
 
 </Project>
