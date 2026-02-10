@@ -11,8 +11,9 @@
 <p align="center">
   <!-- NuGet Version Badge -->
   [![NuGet version](https://img.shields.io/nuget/v/Jattac.Libs.HtmlBuilder.svg)](https://www.nuget.org/packages/Jattac.Libs.HtmlBuilder/)
-  <!-- License Badge -->
-  [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+  <!-- License Badge - Corrected link -->
+  [![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/nyingimaina/Jattac.Libs.HtmlBuilder/blob/master/LICENSE)
+  <!-- Add more badges here as needed, e.g., Build Status, Downloads, etc. -->
 </p>
 
 <p align="center">
@@ -32,6 +33,8 @@
 - [Features](#features)
 - [Installation](#installation)
 - [Two Ways to Build: Declarative vs. Imperative](#two-ways-to-build-declarative-vs-imperative)
+  - [Declarative Style](#declarative-style-recommended-for-most-uses)
+  - [Imperative Style](#imperative-style-for-dynamic-content)
 - [Building Elements](#building-elements)
   - [Text & Headings](#text--headings)
   - [Advanced Text & Links](#advanced-text--links)
@@ -95,6 +98,7 @@ var doc = new HtmlDocument(myTheme, doc =>
 Instantiate builders directly to generate content in loops or complex conditional logic.
 
 ```csharp
+// Ensure you have a 'using Jattac.Libs.HtmlBuilder;' statement
 // Standalone builder usage
 var listBuilder = new ListBuilder(myTheme);
 foreach (var item in myData)
@@ -239,8 +243,6 @@ var doc = new HtmlDocument(doc =>
 
 ## ✨ Styling & Theming: A Comprehensive Walkthrough
 *(This section remains the same as the previous version, as the theming logic has not changed.)*
-
-*(... Abridged for brevity ...)*
 
 ---
 
