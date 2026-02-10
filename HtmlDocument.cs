@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -5,6 +6,7 @@ namespace HtmlBuilding
 {
     /// <summary>
     /// Represents the root of an HTML document, holding the theme and top-level elements.
+    /// This is the main entry point for creating HTML.
     /// </summary>
     public class HtmlDocument
     {
@@ -12,22 +14,27 @@ namespace HtmlBuilding
         private readonly Theme _theme;
 
         /// <summary>
-        /// Initializes a new document with an optional theme.
+        /// Initializes a new document, optionally configuring it with a theme and an expression-based builder.
         /// </summary>
         /// <param name="theme">The theme to apply to all elements. If null, an empty theme is used.</param>
-        public HtmlDocument(Theme theme = null)
+        /// <param name="configure">An action that uses a DocumentBuilder to fluently construct the HTML.</param>
+        public HtmlDocument(Theme? theme = null, Action<DocumentBuilder>? configure = null) // Changed theme to nullable
         {
             _theme = theme ?? new Theme();
+            
+            if (configure != null)
+            {
+                var builder = new DocumentBuilder(this, _theme);
+                configure(builder);
+            }
         }
 
         /// <summary>
-        /// Adds a top-level HTML node to the document.
+        /// Imperatively adds a pre-built node to the document. Useful for standalone builder usage.
         /// </summary>
-        /// <param name="node">The node to add (e.g., a Text, Table, or List).</param>
-        public HtmlDocument Add(IHtmlNode node)
+        public void Add(IHtmlNode node)
         {
             _rootNodes.Add(node);
-            return this;
         }
 
         /// <summary>

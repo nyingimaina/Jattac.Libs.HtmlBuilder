@@ -1,260 +1,197 @@
-# Fluent HTML Builder
+# Fluent HTML Builder (v2)
 
-A C# library for programmatically building responsive, email-client-compatible HTML with a focus on a dream developer experience (DX).
+A C# library for programmatically building responsive, email-client-compatible HTML with a focus on a dream developer experience (DX). This library uses a fluent, expression-based API to create readable, maintainable, and boilerplate-free HTML structures.
 
-This library is designed from the ground up to be:
-- **Fluent & Discoverable:** An intuitive, chainable API that's easy to explore with IDE IntelliSense.
-- **Readable & Self-Documenting:** Your C# code will look like the HTML structure it creates.
+- **Fluent & Discoverable:** A chainable, context-aware API that guides you via IntelliSense.
+- **Readable & Self-Documenting:** Your C# code visually mirrors the HTML structure it creates.
 - **DRY (Don't Repeat Yourself):** A powerful theming system allows you to define styles and attributes once and reuse them everywhere.
+- **Flexible:** Supports both a declarative, lambda-based syntax for clean structure and an imperative, object-based syntax for dynamic, data-driven content.
 - **Safe & Robust:** All content is HTML-encoded by default, and a fail-fast validation system ensures you never generate broken HTML.
 
 ---
 
-## 🚀 Getting Started
+## 🚀 Two Ways to Build: Declarative vs. Imperative
 
-Here's a simple "Hello, World" to get a feel for the library.
+This library supports two powerful design patterns.
+
+**1. Declarative Style (Recommended for most uses)**
+Use a clean, lambda-based syntax to define the structure of your document. This is highly readable and great for static or semi-static content.
 
 ```csharp
-var doc = new HtmlDocument();
+var doc = new HtmlDocument(myTheme, doc =>
+{
+    doc.Heading1("Welcome!")
+       .Paragraph("This document was built declaratively.");
+});
 
-doc.Add(new Text("Hello, World!", asTag: "h1"));
+Console.WriteLine(doc.Build());
+```
 
-string html = doc.Build();
+**2. Imperative Style (For dynamic content)**
+Instantiate builders directly to generate content in loops or complex conditional logic. This gives you maximum control and flexibility.
 
-Console.WriteLine(html); 
-// Output: <h1>Hello, World!</h1>
+```csharp
+// Standalone builder usage
+var listBuilder = new ListBuilder(myTheme);
+foreach (var item in myData)
+{
+    listBuilder.Item(item.Name);
+}
+
+// Add the finished node to the document
+var doc = new HtmlDocument(myTheme);
+doc.Add(listBuilder.GetNode());
+
+Console.WriteLine(doc.Build());
 ```
 
 ---
 
-## ⚙️ Core Concepts
+## ⚙️ Declarative Usage Examples
 
-### 1. The Document
-The `HtmlDocument` is the root container for your HTML. You add elements to it and call `.Build()` when you're ready to generate the final string.
-
-### 2. Nodes
-Everything you can add to the document is a "node" (e.g., `Text`, `Table`, `Image`). All nodes are built from the `IHtmlNode` interface.
-
-### 3. Building
-Calling the `.Build()` method on an `HtmlDocument` instance traverses the entire tree of nodes, resolves all styling and attributes, and renders the final, complete HTML string. All styles are automatically inlined into `style` attributes for maximum email client compatibility.
-
----
-
-## 🧱 Basic Elements
-
-### Text (Headings & Paragraphs)
-Use the `Text` node to create headings and paragraphs. The default is `<p>`.
+### Basic Elements
 
 ```csharp
-var doc = new HtmlDocument()
-    .Add(new Text("This is a heading.", asTag: "h1"))
-    .Add(new Text("This is a standard paragraph of text."));
-
-// Output:
-// <h1>This is a heading.</h1><p>This is a standard paragraph of text.</p>
+var doc = new HtmlDocument(doc =>
+{
+    doc.Heading1("This is a Heading 1");
+    doc.Heading2("This is a Heading 2");
+    doc.Paragraph("This is a standard paragraph of text.");
+    doc.Image("https://via.placeholder.com/150", alt: "A placeholder image");
+});
 ```
-
-### Inline Formatting: Bold & Italics
-You can easily create bold and italicized text. For use inside a `Text` node, pass them into the constructor.
-
-```csharp
-var doc = new HtmlDocument()
-    .Add(new Text(
-        new RawText("This text includes "), // Use RawText for plain text segments
-        new Bold("bold text"),
-        new RawText(" and "),
-        new Italics("italic text.")
-    ));
-
-// Output:
-// <p>This text includes <strong>bold text</strong> and <em>italic text.</em></p>
-```
-
-### Links
-Create hyperlinks using the `Link` node.
-
-```csharp
-var doc = new HtmlDocument()
-    .Add(new Text(
-        new RawText("Please "),
-        new Link("https://example.com", "click here"),
-        new RawText(" to continue.")
-    ));
-
-// Output:
-// <p>Please <a href="https://example.com">click here</a> to continue.</p>
-```
-
-### Images
-Create self-closing `<img>` tags with the `Image` node. The `src` is required.
-
-```csharp
-var doc = new HtmlDocument()
-    .Add(new Image("https://via.placeholder.com/150", alt: "A placeholder image"));
-
-// Output:
-// <img src="https://via.placeholder.com/150" alt="A placeholder image" />
-```
-
----
-
-## 🍽️ Complex Elements
 
 ### Lists
-Create ordered (`<ol>`) or unordered (`<ul>`) lists.
+The `List` builder creates `<ul>` lists, and `OrderedList` creates `<ol>` lists.
 
 ```csharp
-var doc = new HtmlDocument()
-    .Add(new Text("Unordered List:", asTag: "h3"))
-    .Add(new List() // Defaults to unordered
-        .AddItem("First item")
-        .AddItem("Second item")
-        .AddItem(new Link("https://example.com", "A link item"))
-    )
-    .Add(new Text("Ordered List:", asTag: "h3"))
-    .Add(new List(ordered: true)
-        .AddItem("First step")
-        .AddItem("Second step")
-    );
-
-// Output:
-// <h3>Unordered List:</h3>
-// <ul><li>First item</li><li>Second item</li><li><a href="https://example.com">A link item</a></li></ul>
-// <h3>Ordered List:</h3>
-// <ol><li>First step</li><li>Second step</li></ol>
+var doc = new HtmlDocument(doc =>
+{
+    doc.List(list => 
+    {
+        list.Item("First item")
+            .Item("Second item");
+    });
+    
+    doc.OrderedList(list => 
+    {
+        list.Item("Step 1")
+            .Item("Step 2");
+    });
+});
 ```
 
 ### Tables
-Construct tables fluently with `Table`, `TableRow`, and `TableCell`.
+Chain `Table`, `Row`, `HeaderCell`, and `Cell` to build tables fluently.
 
 ```csharp
-var doc = new HtmlDocument()
-    .Add(new Table()
-        .AddRow(
-            new TableCell("ID", isHeader: true),
-            new TableCell("Name", isHeader: true),
-            new TableCell("Status", isHeader: true)
-        )
-        .AddRow(
-            new TableCell("1"),
-            new TableCell("John Doe"),
-            new TableCell(new Bold("Active"))
-        )
-        .AddRow(
-            new TableCell("2"),
-            new TableCell("Jane Smith"),
-            new TableCell(new Italics("Inactive"))
-        )
-    );
-
-// Output:
-// <table>
-//   <tr><th>ID</th><th>Name</th><th>Status</th></tr>
-//   <tr><td>1</td><td>John Doe</td><td><strong>Active</strong></td></tr>
-//   <tr><td>2</td><td>Jane Smith</td><td><em>Inactive</em></td></tr>
-// </table>
+var doc = new HtmlDocument(doc =>
+{
+    doc.Table(table =>
+    {
+        table.Row(row =>
+        {
+            row.HeaderCell("ID");
+            row.HeaderCell("Name");
+        });
+        table.Row(row =>
+        {
+            row.Cell("1");
+            row.Cell("John Doe");
+        });
+    });
+});
 ```
-**Note:** Per the MVP scope, complex nesting is disallowed (e.g., a `List` inside a `TableCell`).
+
+---
+
+## ⚙️ Imperative Usage Example
+
+The imperative style is perfect for when you need to generate HTML from a dynamic data source.
+
+```csharp
+// 1. Imagine you have some data
+var products = new[]
+{
+    new { ID = "A1", Name = "Laptop", Price = 1200.00 },
+    new { ID = "A2", Name = "Mouse", Price = 25.00 },
+};
+
+// 2. Instantiate a builder directly
+var tableBuilder = new TableBuilder(myTheme); // Pass in a theme if needed
+
+// 3. Build the header
+tableBuilder.Row(row =>
+{
+    row.HeaderCell("ID");
+    row.HeaderCell("Name");
+    row.HeaderCell("Price");
+});
+
+// 4. Loop over your data to build the body
+foreach (var p in products)
+{
+    tableBuilder.Row(row =>
+    {
+        row.Cell(p.ID);
+        row.Cell(p.Name);
+        row.Cell(p.Price.ToString("C")); // Format as currency
+    });
+}
+
+// 5. Add the completed node to a document
+var doc = new HtmlDocument(myTheme);
+doc.Add(tableBuilder.GetNode()); // Get the final IHtmlNode from the builder
+
+// The final document now contains your dynamic table
+Console.WriteLine(doc.Build());
+```
 
 ---
 
 ## ✨ Styling & Theming
 
-### Method 1: Local Overrides (The Simple Way)
-You can apply styles and attributes directly to any node using a fluent interface. This is perfect for one-off modifications.
+Apply styles and attributes to any element using the fluent methods on its builder.
 
 - `.Style("key", "value")`: Adds a single CSS style.
 - `.Attr("key", "value")`: Adds a single HTML attribute.
-- `.Class("name")`: Adds a CSS class name (used for theming).
+- `.Class("name")`: Adds a CSS class name (for theme matching).
+
+**Precedence Rule:** Local styles/attributes **always override** theme styles/attributes.
+
+### Example: Combining Theming and Local Overrides
 
 ```csharp
-var doc = new HtmlDocument()
-    .Add(new Link("https://example.com", "Click Me!")
-        .Style<Link>("color", "white")
-        .Style<Link>("text-decoration", "none")
-        .Style<Link>("background-color", "blue")
-        .Style<Link>("padding", "10px 15px")
-        .Attr<Link>("target", "_blank")
-        .Class<Link>("button") // Add a class for theme matching
-    );
-
-// Output (style order may vary):
-// <a href="https://example.com" target="_blank" class="button" style="color:white;text-decoration:none;background-color:blue;padding:10px 15px">Click Me!</a>
-```
-
-### Method 2: Theming (The Powerful, DRY Way)
-For consistent styling, the theming system is the recommended approach. You define styles once in a `Theme` object and it's applied automatically.
-
-**Style Precedence Rule:** Local styles and attributes always **override** theme styles.
-
-#### Full Theming Example:
-```csharp
-// 1. Define your Theme
+// 1. Define a Theme
 var myTheme = new Theme();
+myTheme.AddStyle("h1", new ElementStyle().SetStyle("color", "navy"));
+myTheme.AddStyle(".special-paragraph", new ElementStyle().SetStyle("font-style", "italic"));
 
-// Add a style for all <h1> tags
-myTheme.AddStyle("h1", new ElementStyle()
-    .SetStyle("font-family", "Arial, sans-serif")
-    .SetStyle("color", "#333333"));
+// 2. Build the document using the theme
+var doc = new HtmlDocument(myTheme, doc =>
+{
+    // This h1 will automatically be navy from the theme
+    doc.Heading1("Themed Heading");
 
-// Add a style for all <table> tags
-myTheme.AddStyle("table", new ElementStyle()
-    .SetAttribute("cellspacing", "0")
-    .SetAttribute("cellpadding", "5")
-    .SetAttribute("width", "100%")
-    .SetStyle("border-collapse", "collapse"));
+    // This paragraph gets a theme style via its class
+    doc.Paragraph("This is a special paragraph from the theme.")
+       .Class("special-paragraph");
 
-// Add a reusable class style for ".header"
-myTheme.AddStyle(".header", new ElementStyle()
-    .SetStyle("background-color", "#f2f2f2")
-    .SetStyle("font-weight", "bold"));
+    // This paragraph overrides the theme with a local style
+    doc.Paragraph("This paragraph has a local style override.")
+       .Class("special-paragraph") // It matches the theme...
+       .Style("font-style", "normal") // ...but this local style wins!
+       .Style("color", "red");
+});
 
-// 2. Create a document WITH the theme
-var doc = new HtmlDocument(myTheme);
-
-// 3. Create elements as usual
-doc.Add(new Text("Themed Invoice", asTag: "h1")); // Will automatically get h1 styles
-
-doc.Add(new Table()
-    // This row gets the ".header" class styles
-    .AddRow(
-        new TableCell("Item").Class<TableCell>("header"),
-        new TableCell("Price").Class<TableCell>("header")
-    )
-    .AddRow(
-        new TableCell("Laptop"),
-        // This specific cell gets a local override
-        new TableCell("$1200").Style<TableCell>("font-weight", "bold")
-    )
-);
-
-string html = doc.Build();
-Console.WriteLine(html);
-```
-
-**Output of Theming Example:**
-```html
-<h1 style="font-family:Arial, sans-serif;color:#333333">Themed Invoice</h1>
-<table cellspacing="0" cellpadding="5" width="100%" style="border-collapse:collapse">
-  <tr>
-    <th class="header" style="background-color:#f2f2f2;font-weight:bold">Item</th>
-    <th class="header" style="background-color:#f2f2f2;font-weight:bold">Price</th>
-  </tr>
-  <tr>
-    <td>Laptop</td>
-    <td style="font-weight:bold">$1200</td>
-  </tr>
-</table>
+// Output:
+// <h1 style="color:navy">Themed Heading</h1>
+// <p class="special-paragraph" style="font-style:italic">This is a special paragraph from the theme.</p>
+// <p class="special-paragraph" style="font-style:normal;color:red">This paragraph has a local style override.</p>
 ```
 
 ---
 
 ## ⚠️ Validation & Error Handling
 
-The library follows a **"fail-fast"** principle. If you try to build an invalid node, the `.Build()` method will throw an `InvalidOperationException` with a clear error message. This prevents you from ever generating broken or incomplete HTML.
-
-```csharp
-// This will throw an exception during .Build()
-var brokenImage = new Image(""); // src is empty
-var brokenLink = new Link("", "text"); // href is empty
-```
+The library uses a **"fail-fast"** principle. If you try to build an invalid node (e.g., an `Image` without a `src`), the `.Build()` method will throw an `InvalidOperationException` with a clear error message, preventing broken HTML from being generated.
