@@ -9,7 +9,7 @@
     <!-- NuGet Package Properties -->
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageId>Jattac.Libs.HtmlBuilder</PackageId>
-    <Version>1.1.0</Version> <!-- Incremented version -->
+    <Version>1.1.1</Version> <!-- Incremented version -->
     <Authors>Jattac Contributors</Authors>
     <Company>Jattac</Company>
     <Description>A fluent C# library for building responsive, email-client-compatible HTML with a dream developer experience.</Description>
