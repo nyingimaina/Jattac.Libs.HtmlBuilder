@@ -77,6 +77,7 @@ namespace HtmlBuilding
             return AddNode(builder.GetNode());
         }
 
+        // --- Table Builder ---
         public DocumentBuilder Table(Action<TableBuilder> config)
         {
             var builder = new TableBuilder(new TableNode(), _theme);
@@ -141,28 +142,69 @@ namespace HtmlBuilding
     public class TableBuilder : Builder<TableBuilder, TableNode>
     {
         internal TableBuilder(TableNode node, Theme theme) : base(node, theme) { }
-        public TableBuilder Row(Action<RowBuilder> config)
+        
+        private int? _internalExpectedColumnCount; // To manage column count for validation
+        // Removed: private bool _hasSpansUsed = false; // This field was redundant
+
+        public TableBuilder Header(Action<RowBuilder> config)
         {
-            var builder = new RowBuilder(new TableRowNode(), _theme);
+            if (_internalExpectedColumnCount.HasValue) throw new InvalidOperationException("Table can only have one header row.");
+
+            var builder = new RowBuilder(new TableRowNode(), _theme, this);
             config(builder);
             _node.AddChild(builder.GetNode());
+            _internalExpectedColumnCount = ((TableRowNode)builder.GetNode()).ChildCount;
             return this;
+        }
+
+        public TableBuilder Row(Action<RowBuilder> config)
+        {
+            var builder = new RowBuilder(new TableRowNode(), _theme, this);
+            config(builder);
+            _node.AddChild(builder.GetNode());
+
+            if (!_internalExpectedColumnCount.HasValue)
+            {
+                 _internalExpectedColumnCount = ((TableRowNode)builder.GetNode()).ChildCount;
+            }
+            return this;
+        }
+
+        // Internal method for RowBuilder to signal span usage
+        internal void SetHasSpans()
+        {
+            ((TableNode)_node).HasSpans = true; // Directly sets HasSpans on the TableNode
+        }
+
+        public new IHtmlNode GetNode()
+        {
+            ((TableNode)_node).ExpectedColumnCount = _internalExpectedColumnCount;
+            return _node;
         }
     }
 
     public class RowBuilder : Builder<RowBuilder, TableRowNode>
     {
-        internal RowBuilder(TableRowNode node, Theme theme) : base(node, theme) { }
-        public RowBuilder Cell(string text) => Cell(new RawTextNode(text));
-        public RowBuilder Cell(IHtmlNode content)
+        private readonly TableBuilder? _parentTableBuilder;
+
+        internal RowBuilder(TableRowNode node, Theme theme, TableBuilder? parentTableBuilder = null) : base(node, theme) 
         {
-            _node.AddChild(new TableCellNode(false).With(n => n.AddChild(content)));
+            _parentTableBuilder = parentTableBuilder;
+        }
+
+        public RowBuilder Cell(string text, int rowSpan = 1, int colSpan = 1) => Cell(new RawTextNode(text), rowSpan, colSpan);
+        public RowBuilder Cell(IHtmlNode content, int rowSpan = 1, int colSpan = 1)
+        {
+            if (rowSpan > 1 || colSpan > 1) _parentTableBuilder?.SetHasSpans();
+            _node.AddChild(new TableCellNode(false, rowSpan, colSpan).With(n => n.AddChild(content)));
             return this;
         }
-        public RowBuilder HeaderCell(string text) => HeaderCell(new RawTextNode(text));
-        public RowBuilder HeaderCell(IHtmlNode content)
+
+        public RowBuilder HeaderCell(string text, int rowSpan = 1, int colSpan = 1) => HeaderCell(new RawTextNode(text), rowSpan, colSpan);
+        public RowBuilder HeaderCell(IHtmlNode content, int rowSpan = 1, int colSpan = 1)
         {
-            _node.AddChild(new TableCellNode(true).With(n => n.AddChild(content)));
+            if (rowSpan > 1 || colSpan > 1) _parentTableBuilder?.SetHasSpans();
+            _node.AddChild(new TableCellNode(true, rowSpan, colSpan).With(n => n.AddChild(content)));
             return this;
         }
     }

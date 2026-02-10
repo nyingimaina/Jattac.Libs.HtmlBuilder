@@ -1,13 +1,14 @@
-# Business Requirements Specification (BRS): Fluent Email HTML Builder (Version 2.1)
+# Business Requirements Specification (BRS): Fluent Email HTML Builder (Version 2.2)
 
 ## 1. Vision & Purpose
 To provide C# developers with a **dream developer experience (DX)** for programmatically building responsive, email-client-compatible HTML. The library will eliminate boilerplate and the fragility of string manipulation, enabling the rapid and reliable creation of common email content structures through a fluent, expression-based API.
 
 ## 2. Guiding Principles
 *   **Fluent & Discoverable:** An intuitive, chainable API that developers can explore through IDE IntelliSense.
-*   **Near-Zero Boilerplate:** Common tasks should require the absolute minimum amount of code.
-*   **DRY (Don't Repeat Yourself) via Theming:** A robust theming system will be the primary mechanism for reusing styles and attributes, ensuring consistency and easy maintenance.
-*   **Self-Documenting:** The C# code itself should be readable enough to clearly describe the resulting HTML structure.
+*   **Readable & Self-Documenting:** Your C# code visually mirrors the HTML structure it creates.
+*   **DRY (Don't Repeat Yourself):** A powerful theming system will be the primary mechanism for reusing styles and attributes, ensuring consistency and easy maintenance.
+*   **Flexible:** Supports both a declarative, lambda-based syntax for clean structure and an imperative, object-based syntax for dynamic, data-driven content.
+*   **Safe & Robust:** All content is HTML-encoded by default, and a fail-fast validation system ensures you never generate broken HTML.
 
 ## 3. MVP Scope
 
@@ -16,7 +17,7 @@ The MVP will focus on the following foundational elements:
 *   **Text:** Paragraphs, headings, and other block-level text elements (`<div>`, `<span>`, etc.). Includes inline formatting like `<strong>` and `<em>`.
 *   **Links:** `<a>` tags with `href` attributes.
 *   **Images:** `<img>` tags with `src` and `alt` attributes.
-*   **Tables:** The complete structure of `<table>`, `<tr>`, `<th>`, and `<td>`.
+*   **Tables:** The complete structure of `<table>`, `<tr>`, `<th>`, and `<td>`, including support for `rowspan` and `colspan` attributes.
 *   **Lists:** Ordered (`<ol>`) and unordered (`<ul>`) lists with `<li>` items.
 
 ### 3.2 Explicitly Out-of-Scope for MVP:
@@ -36,10 +37,12 @@ The MVP will focus on the following foundational elements:
 *   **Core Builders:** Provide dedicated, fluent builders for all in-scope elements. Builders must support both declarative (lambda-based) and imperative (standalone object) construction.
 *   **Flexible Text Block Creation:** The API must provide a generic method to create any block-level text element (e.g., `p`, `h1`-`h6`, `div`) by specifying the tag name as a string. Convenience methods for common tags (`.Paragraph()`, `.Heading1()`) must also be available.
 *   **Advanced Text Composition:** A dedicated `TextContentBuilder` must be provided to allow for the fluent composition of mixed inline content within a single text block. This includes mixing plain text, `<strong>`, `<em>`, and `<a>` elements, including nested combinations (e.g., bold and italic text).
+*   **Table Enhancements:** The `TableBuilder` will provide a `Header()` method for explicit header row definition. `RowBuilder`'s `Cell()` and `HeaderCell()` methods will support optional `rowspan` and `colspan` attributes.
 *   **Local Style Overrides:** Developers must be able to define arbitrary, one-off CSS styles on any element instance using a `.Style("key", "value")` method.
 
 ## 5. Build Process & Validation
 *   **Self-Validation & Fail-Fast:** Each node **must** validate itself during the build step. An invalid state must throw a descriptive exception.
+*   **Table Structure Validation:** The library will perform column count validation for tables. If a table contains any cells with `rowspan` or `colspan` attributes, this automatic column count validation will be **skipped**, and the developer assumes responsibility for ensuring the structural correctness of the table.
 *   **Style Resolution Logic:** The final inline style attribute must be computed by merging styles in the following order of precedence: Local Styles > Theme Styles.
 *   **Mandatory Style Inlining:** The build process must generate a single HTML string where all CSS styles are fully resolved and inlined into the `style=""` attribute of each respective element.
 

@@ -1,4 +1,4 @@
-# Fluent HTML Builder (v2.1)
+# Fluent HTML Builder (v2.2)
 
 A C# library for programmatically building responsive, email-client-compatible HTML with a focus on a dream developer experience (DX). This library uses a fluent, expression-based API to create readable, maintainable, and boilerplate-free HTML structures.
 
@@ -73,9 +73,12 @@ var doc = new HtmlDocument(doc =>
     doc.Paragraph(p =>
     {
         p.Raw("This text is normal. ")
-         .Bold(b => b.Raw("This part is bold, but ").Italic("this part is bold and italic."))
+         .Bold(b => {
+             b.Raw("This part is bold, but ");
+             b.Italic(i => i.Raw("this part is bold and italic."));
+         })
          .Raw(" Now back to normal, and here is a ")
-         .Link("https://example.com", "link!");
+         .Link("https://example.com", l => l.Raw("link!"));
     });
 });
 
@@ -93,69 +96,94 @@ var doc = new HtmlDocument(doc =>
 });
 ```
 
-### Lists & Tables
-The API for Lists and Tables remains the same powerful and fluent experience.
+### Lists
+Create ordered (`<ol>`) or unordered (`<ul>`) lists.
+
+```csharp
+var doc = new HtmlDocument(doc =>
+{
+    doc.List(list => 
+    {
+        list.Item("First item")
+            .Item("Second item");
+    });
+    
+    doc.OrderedList(list => 
+    {
+        list.Item("Step 1")
+            .Item("Step 2");
+    });
+});
+```
+
+### Tables
+Construct tables fluently with `Table`, `Header` (for `<thead>`), and `Row` (for `<tbody>`).
 
 ```csharp
 var doc = new HtmlDocument(doc =>
 {
     doc.Table(table =>
     {
+        // Define your header row
+        table.Header(row =>
+        {
+            row.HeaderCell("Product ID");
+            row.HeaderCell("Product Name");
+            row.HeaderCell("Price");
+        });
+        
+        // Add data rows
         table.Row(row =>
         {
-            row.HeaderCell("ID");
-            row.HeaderCell("Name");
+            row.Cell("P101");
+            row.Cell("Laptop");
+            row.Cell("$1200");
         });
         table.Row(row =>
         {
-            row.Cell("1");
-            row.Cell("John Doe");
+            row.Cell("P102");
+            row.Cell("Mouse");
+            row.Cell("$25");
         });
     });
 });
 ```
 
----
+#### Tables with Rowspan and Colspan
+You can specify `rowSpan` and `colSpan` for individual cells.
 
-## ⚙️ Imperative Usage Example
-
-The imperative style is perfect for when you need to generate HTML from a dynamic data source.
+**Important Note on Validation:** If any cell within a table uses `rowSpan` or `colSpan`, the library's automatic column count validation is **skipped**. It becomes the developer's responsibility to ensure the structural correctness of the table when using these advanced spanning attributes.
 
 ```csharp
-// 1. Imagine you have some data
-var products = new[]
+var doc = new HtmlDocument(doc =>
 {
-    new { ID = "A1", Name = "Laptop", Price = 1200.00 },
-    new { ID = "A2", Name = "Mouse", Price = 25.00 },
-};
-
-// 2. Instantiate a builder directly
-var tableBuilder = new TableBuilder(myTheme); // Pass in a theme if needed
-
-// 3. Build the header
-tableBuilder.Row(row =>
-{
-    row.HeaderCell("ID");
-    row.HeaderCell("Name");
-    row.HeaderCell("Price");
-});
-
-// 4. Loop over your data to build the body
-foreach (var p in products)
-{
-    tableBuilder.Row(row =>
+    doc.Table(table =>
     {
-        row.Cell(p.ID);
-        row.Cell(p.Name);
-        row.Cell(p.Price.ToString("C")); // Format as currency
+        table.Header(row =>
+        {
+            row.HeaderCell("Details", colSpan: 2); // Header spans 2 columns
+            row.HeaderCell("Status");
+        });
+        table.Row(row =>
+        {
+            row.Cell("Item A");
+            row.Cell("Value 1");
+            row.Cell("Active");
+        });
+        table.Row(row =>
+        {
+            row.Cell("Summary", rowSpan: 2); // This cell spans 2 rows
+            row.Cell("Item B");
+            row.Cell("Pending");
+        });
+        table.Row(row =>
+        {
+            // This row effectively starts under the "Summary" cell
+            row.Cell("Item C");
+            row.Cell("Completed");
+        });
     });
-}
-
-// 5. Add the completed node to a document
-var doc = new HtmlDocument(myTheme);
-doc.Add(tableBuilder.GetNode()); // Get the final IHtmlNode from the builder
-
-Console.WriteLine(doc.Build());
+});
 ```
 
 ---
@@ -167,8 +195,6 @@ Apply styles and attributes to any element using the fluent methods on its build
 - `.Style("key", "value")`: Adds a single CSS style.
 - `.Attr("key", "value")`: Adds a single HTML attribute.
 - `.Class("name")`: Adds a CSS class name (for theme matching).
-
-**Precedence Rule:** Local styles/attributes **always override** theme styles/attributes.
 
 ```csharp
 // This example uses the new TextContentBuilder
@@ -193,3 +219,4 @@ var doc = new HtmlDocument(doc =>
 ## ⚠️ Validation & Error Handling
 
 The library uses a **"fail-fast"** principle. If you try to build an invalid node (e.g., an `Image` without a `src`), the `.Build()` method will throw an `InvalidOperationException` with a clear error message, preventing broken HTML from being generated.
+For tables, automatic column count validation is applied to ensure all rows match the header (or first data row) count. However, this validation is **skipped if any cell in the table uses `rowSpan` or `colSpan` attributes**, placing the responsibility for structural correctness on the developer.

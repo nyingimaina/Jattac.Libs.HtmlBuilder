@@ -111,8 +111,8 @@ namespace HtmlBuilding.HtmlModel
 
     // Concrete model nodes
     public class TextNode : ElementNode { public TextNode(string tag) : base(tag) { } }
-    public class StrongNode : ElementNode { public StrongNode() : base("strong") { } } // New
-    public class EmNode : ElementNode { public EmNode() : base("em") { } } // New
+    public class StrongNode : ElementNode { public StrongNode() : base("strong") { } }
+    public class EmNode : ElementNode { public EmNode() : base("em") { } }
     public class LinkNode : ElementNode 
     { 
         public LinkNode() : base("a") { }
@@ -131,9 +131,49 @@ namespace HtmlBuilding.HtmlModel
                 throw new InvalidOperationException("Image 'src' attribute cannot be empty.");
         }
     }
-    public class TableNode : ElementNode { public TableNode() : base("table") { } }
-    public class TableRowNode : ElementNode { public TableRowNode() : base("tr") { } }
-    public class TableCellNode : ElementNode { public TableCellNode(bool isHeader) : base(isHeader ? "th" : "td") { } }
+
+    public class TableNode : ElementNode 
+    { 
+        public TableNode() : base("table") { } 
+        public int? ExpectedColumnCount { get; set; } // Track expected column count
+        public bool HasSpans { get; set; } // Flag to indicate if any cell has row/col span
+
+        protected override void Validate()
+        {
+            if (HasSpans) return; // Skip validation if spans are present
+
+            if (!ExpectedColumnCount.HasValue)
+            {
+                // If no header or first row defined expected count, it's an issue for strict validation
+                // For now, let's assume if ExpectedColumnCount isn't set, we don't strictly validate (or could throw)
+                return; 
+            }
+
+            foreach (var child in _children)
+            {
+                if (child is TableRowNode row)
+                {
+                    if (row.ChildCount != ExpectedColumnCount.Value)
+                    {
+                        throw new InvalidOperationException($"Table validation failed: Row has {row.ChildCount} cells, but expected {ExpectedColumnCount.Value}.");
+                    }
+                }
+            }
+        }
+    }
+    public class TableRowNode : ElementNode 
+    { 
+        public TableRowNode() : base("tr") { } 
+        public int ChildCount => _children.Count; // Expose child count for validation
+    }
+    public class TableCellNode : ElementNode 
+    { 
+        public TableCellNode(bool isHeader, int rowSpan = 1, int colSpan = 1) : base(isHeader ? "th" : "td") 
+        {
+            if (rowSpan > 1) AddAttribute("rowspan", rowSpan.ToString());
+            if (colSpan > 1) AddAttribute("colspan", colSpan.ToString());
+        }
+    }
     public class ListNode : ElementNode { public ListNode(bool ordered) : base(ordered ? "ol" : "ul") { } }
     public class ListItemNode : ElementNode { public ListItemNode() : base("li") { } }
 }
