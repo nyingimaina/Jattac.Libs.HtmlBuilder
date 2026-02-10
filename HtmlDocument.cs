@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace HtmlBuilding
+namespace Jattac.Libs.HtmlBuilder
 {
     /// <summary>
     /// Represents the root of an HTML document, holding the theme and top-level elements.

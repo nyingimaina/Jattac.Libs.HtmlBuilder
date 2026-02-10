@@ -1,7 +1,7 @@
 using System;
-using HtmlBuilding.HtmlModel;
+using Jattac.Libs.HtmlBuilder.HtmlModel;
 
-namespace HtmlBuilding
+namespace Jattac.Libs.HtmlBuilder
 {
     // A generic builder to provide common fluent methods for element nodes.
     public abstract class Builder<TBuilder, TNode> where TBuilder : class where TNode : ElementNode

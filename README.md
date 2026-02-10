@@ -1,4 +1,4 @@
-# Fluent HTML Builder (v2.3)
+# Fluent HTML Builder (Jattac.Libs.HtmlBuilder v1.0.0)
 
 A C# library for programmatically building responsive, email-client-compatible HTML with a focus on a dream developer experience (DX). This library uses a fluent, expression-based API to create readable, maintainable, and boilerplate-free HTML structures.
 
@@ -18,6 +18,7 @@ This library supports two powerful design patterns.
 Use a clean, lambda-based syntax to define the structure of your document. This is highly readable and great for static or semi-static content.
 
 ```csharp
+// Ensure you have a 'using Jattac.Libs.HtmlBuilder;' statement
 var doc = new HtmlDocument(myTheme, doc =>
 {
     doc.Heading1("Welcome!")
@@ -31,6 +32,7 @@ Console.WriteLine(doc.Build());
 Instantiate builders directly to generate content in loops or complex conditional logic. This gives you maximum control and flexibility.
 
 ```csharp
+// Ensure you have a 'using Jattac.Libs.HtmlBuilder;' statement
 // Standalone builder usage
 var listBuilder = new ListBuilder(myTheme);
 foreach (var item in myData)
@@ -201,6 +203,7 @@ This library emphasizes **DRY** (Don't Repeat Yourself) principles through its p
 A `Theme` object is a collection of `ElementStyle` definitions. `ElementStyle` allows you to define both CSS styles and HTML attributes for a given selector.
 
 ```csharp
+// Ensure you have a 'using Jattac.Libs.HtmlBuilder;' statement
 var myTheme = new Theme();
 
 // --- Tag-Based Styling ---

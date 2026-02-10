@@ -1,4 +1,4 @@
-namespace HtmlBuilding
+namespace Jattac.Libs.HtmlBuilder
 {
     /// <summary>
     /// Represents any object that can be built into an HTML string.

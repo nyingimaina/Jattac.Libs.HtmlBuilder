@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace HtmlBuilding
+namespace Jattac.Libs.HtmlBuilder
 {
     /// <summary>
     /// Defines a collection of styles and attributes that can be applied to HTML elements.

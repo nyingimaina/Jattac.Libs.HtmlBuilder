@@ -1,7 +1,7 @@
 # Business Requirements Specification (BRS): Fluent Email HTML Builder (Version 2.3)
 
 ## 1. Vision & Purpose
-To provide C# developers with a **dream developer experience (DX)** for programmatically building responsive, email-client-compatible HTML. The library will eliminate boilerplate and the fragility of string manipulation, enabling the rapid and reliable creation of common email content structures through a fluent, expression-based API.
+To provide C# developers with a **dream developer experience (DX)** for programmatically building responsive, email-client-compatible HTML. The library will eliminate boilerplate and the fragility of string manipulation, enabling the rapid and reliable creation of common HTML content structures through a fluent, expression-based API.
 
 ## 2. Guiding Principles
 *   **Fluent & Discoverable:** An intuitive, chainable API that developers can explore through IDE IntelliSense.
@@ -33,6 +33,7 @@ The MVP will focus on the following foundational elements:
 *   **Attribute Merging Logic:**
     *   For the `class` attribute, local and theme values will be **appended**.
     *   For all other attributes, a locally-set value will **override** the theme value.
+*   **Comprehensive Documentation:** Provide detailed examples and walkthroughs for defining, applying, and overriding theme styles and attributes.
 
 ### 4.2 Fluent HTML Builders
 *   **Core Builders:** Provide dedicated, fluent builders for all in-scope elements. Builders must support both declarative (lambda-based) and imperative (standalone object) construction.
@@ -40,6 +41,7 @@ The MVP will focus on the following foundational elements:
 *   **Advanced Text Composition:** A dedicated `TextContentBuilder` must be provided to allow for the fluent composition of mixed inline content within a single text block. This includes mixing plain text (`Raw`), `<strong>` (`Bold`), `<em>` (`Italic`), and `<a>` (`Link`) elements, including nested combinations (e.g., bold and italic text, bold text inside a link).
 *   **Table Enhancements:** The `TableBuilder` will provide a `Header()` method for explicit header row definition. `RowBuilder`'s `Cell()` and `HeaderCell()` methods will support optional `rowspan` and `colspan` attributes.
 *   **Local Style Overrides:** Developers must be able to define arbitrary, one-off CSS styles (`.Style("key", "value")`) and HTML attributes (`.Attr("key", "value")`) on any element builder. These local definitions will always take precedence over any conflicting theme styles or attributes.
+*   **Comprehensive Documentation:** Provide detailed examples and walkthroughs for using links, and all other fluent builder capabilities.
 
 ## 5. Build Process & Validation
 *   **Self-Validation & Fail-Fast:** Each node **must** validate itself during the build step. An invalid state must throw a descriptive exception.
@@ -52,4 +54,4 @@ The MVP will focus on the following foundational elements:
 *   **Clear Error Handling:** The build process must provide clear, actionable error messages for any issues encountered.
 
 ## 7. Project Deliverables
-*   **Documentation & Examples:** The final deliverable must include clear API documentation with practical usage examples, especially for setting up and using the Theming system and advanced text composition.
+*   **Documentation & Examples:** The final deliverable must include clear API documentation with practical usage examples, especially for setting up and using the Theming system and advanced text composition. This documentation will be maintained in `README.md` and `BusinessRequirementsSpecification.md`, ensuring they remain synchronized with the codebase.

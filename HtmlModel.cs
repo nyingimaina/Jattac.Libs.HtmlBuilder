@@ -4,7 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 
-namespace HtmlBuilding.HtmlModel
+namespace Jattac.Libs.HtmlBuilder.HtmlModel
 {
     // A simple node for raw text content, which will be HTML encoded.
     public class RawTextNode : IHtmlNode

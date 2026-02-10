@@ -2,15 +2,38 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <ImplicitUsings>disable</ImplicitUsings> <!-- Changed to disable -->
+    <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <LangVersion>8.0</LangVersion>
+    
+    <!-- NuGet Package Properties -->
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <PackageId>HtmlBuilding</PackageId>
+    <PackageId>Jattac.Libs.HtmlBuilder</PackageId>
     <Version>1.0.0</Version>
-    <Authors>YourName</Authors>
-    <Company>YourCompany</Company>
-    <Description>A fluent C# library for building responsive, email-client-compatible HTML.</Description>
+    <Authors>Jattac Contributors</Authors>
+    <Company>Jattac</Company>
+    <Description>A fluent C# library for building responsive, email-client-compatible HTML with a dream developer experience.</Description>
+    <RepositoryUrl>https://github.com/nyingimaina/Jattac.Libs.HtmlBuilder.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>HTML;Builder;Fluent;Email;C#;Library;DSL</PackageTags>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <PackageReleaseNotes>
+      Initial release of Jattac.Libs.HtmlBuilder.
+      Features include:
+      - Fluent, expression-based API for HTML construction.
+      - Comprehensive theming system.
+      - Advanced text composition with nested inline elements.
+      - Table builder with rowspan/colspan support and conditional validation.
+      - Built-in validation and fail-fast error handling.
+      - Full style inlining for email compatibility.
+    </PackageReleaseNotes>
+    <RootNamespace>Jattac.Libs.HtmlBuilder</RootNamespace> <!-- Set Default Root Namespace -->
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
 
 </Project>
